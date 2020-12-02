@@ -1,0 +1,10 @@
+/.ipynb_checkpoints
+/.vscode
+.python-version
+data_info.txt
+/Dataset/*.npz
+/DataUtils/__pycache__
+/Model/__pycache__
+/Evaluation/*.csv
+/Evaluation/*.npy
+/Evaluation/ans
