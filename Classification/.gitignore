@@ -3,6 +3,7 @@
 .python-version
 data_info.txt
 /Dataset/*.npz
+/Data/*.npy
 /DataUtils/__pycache__
 /Model/__pycache__
 /Evaluation/*.csv
