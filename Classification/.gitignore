@@ -9,3 +9,5 @@ data_info.txt
 /Evaluation/*.csv
 /Evaluation/*.npy
 /Evaluation/ans
+log.txt
+/DataUtils/class_name.txt
