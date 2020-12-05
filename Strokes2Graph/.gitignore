@@ -1,5 +1,5 @@
 .python-version
 /.vscode
 /.ipynb_checkpoints
-/data/*.csv
-/data_npy/*.npy
+*.csv
+*.npy

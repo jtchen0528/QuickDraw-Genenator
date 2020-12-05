@@ -37,6 +37,8 @@ if __name__ == '__main__':
                         choices=[0, 1], default=0, help='1 for download data, 0 for not.')
     parser.add_argument('--show_random_imgs', '-show', action='store_true',
                         default=False, help='show some random images while generating the dataset.')
+    parser.add_argument('--img_size', '-size', type=int,
+                        default=784, help='size of image')
     args = parser.parse_args()
 
     # Download data.
@@ -45,4 +47,4 @@ if __name__ == '__main__':
 
     # Generate dataset
     generate_dataset(vfold_ratio=args.valfold, max_samples_per_class=args.max_samples_category,
-                     show_imgs=args.show_random_imgs)
+                     show_imgs=args.show_random_imgs, frame_size=args.img_size)

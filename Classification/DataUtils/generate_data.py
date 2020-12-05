@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from random import randint
 
 
-def generate_dataset(rawdata_root="Data", target_root="Dataset", vfold_ratio=0.2, max_samples_per_class=5000, show_imgs=False):
+def generate_dataset(rawdata_root="Data", target_root="Dataset", vfold_ratio=0.2, max_samples_per_class=5000, show_imgs=False, frame_size=28):
     """
     args:
     - rawdata_root: str, specify the directory path of raw data
@@ -30,7 +30,7 @@ def generate_dataset(rawdata_root="Data", target_root="Dataset", vfold_ratio=0.2
     print("*"*50)
 
     # initialize variables
-    x = np.empty([0, 784])
+    x = np.empty([0, frame_size * frame_size])
     y = np.empty([0])
     class_names = []
     class_samples_num = []
