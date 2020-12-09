@@ -89,7 +89,7 @@ if __name__ == '__main__':
             class_samples_num.append(str(data.shape[0]))
 
             print(str(idx+1)+"/"+str(len(all_files)) +
-                "\t- "+class_name+" has been loaded. \n\t\t Totally "+str(data.shape[0])+" samples.")
+                  "\t- "+class_name+" has been loaded. \n\t\t Totally "+str(data.shape[0])+" samples.")
             print("~"*50)
 
         print("\n"+"*"*50)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
         print("x size: ")
         print(x.shape)
-            
+
         np.savez_compressed(target_root+"/eval", data=x, target=y)
 
         print("*"*50)
@@ -139,8 +139,9 @@ if __name__ == '__main__':
             for j in range(shape):
                 if canvas[i * shape + j] == 0:
                     Img[i][j] = [1, 1, 1]
-                else: 
-                    Img[i][j] = [1 - canvas[i * shape + j]/255, 1 - canvas[i * shape + j]/255, 1 - canvas[i * shape + j]/255]
+                else:
+                    Img[i][j] = [1 - canvas[i * shape + j]/255, 1 -
+                                 canvas[i * shape + j]/255, 1 - canvas[i * shape + j]/255]
         plt.imshow(Img)
         plt.title(name)
         plt.savefig("./" + root + "/ans/" + str(idx) + "_" + name + ".png")
@@ -175,7 +176,7 @@ if __name__ == '__main__':
         detached = r.detach().cpu().numpy()
         evaluation_res = np.append(evaluation_res, detached)
         total = len(detached) + total
-    evaluation_res = [int(i) for i in evaluation_res.tolist()] 
+    evaluation_res = [int(i) for i in evaluation_res.tolist()]
 
     labels = []
     with open("./DataUtils/class_names.txt", "r") as f:
@@ -209,7 +210,8 @@ if __name__ == '__main__':
     for i in range(len(TestData)):
         index = index + 1
         if (index % 20 == 0):
-            print("Graph generation at " + str(int(index / len(TestData) * 10000) / 100) + " Percent.", end='\r')
+            print("Graph generation at " + str(int(index /
+                                                   len(TestData) * 10000) / 100) + " Percent.", end='\r')
         saveImg(args.data_root, TestData[i], df['Answer'][i], i)
 
     print("Evaluation completed.")
