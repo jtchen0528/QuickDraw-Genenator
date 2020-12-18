@@ -81,11 +81,11 @@ if __name__ == '__main__':
 
         print("Csv generation complete.")
 
-    if args.gen_img :
-        os.makedirs(args.output_dir + '/images', exist_ok=True)
+        if args.gen_img :
+            os.makedirs(args.output_dir + '/images', exist_ok=True)
 
-        files = os.listdir("./" + args.output_dir + '/csv')
-        for f in files:
-            img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
-            plt.imshow(img, cmap='gray')
-            plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')
+            files = os.listdir("./" + args.output_dir + '/csv')
+            for f in files:
+                img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
+                plt.imshow(img, cmap='gray')
+                plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')
