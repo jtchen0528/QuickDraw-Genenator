@@ -1,3 +1,4 @@
 /output
 /Models
-*/__pycache__
+/Models_DCCGAN
+/__pycache__
