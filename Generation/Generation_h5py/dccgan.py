@@ -17,34 +17,6 @@ from torch.utils.data import DataLoader
 from Models import DCCGAN_Generator, DCCGAN_Discriminator
 from Datasets import QuickDrawDataset_h5py
 
-def show_result(num_epoch, classes, show=False, save=False, path='result.png'):
-
-    G.eval()
-    test_images = G(fixed_z_, fixed_y_label_)
-    G.train()
-
-    size_figure_grid = classes
-    fig, ax = plt.subplots(size_figure_grid, size_figure_grid, figsize=(5, 5))
-    for i, j in itertools.product(range(size_figure_grid), range(size_figure_grid)):
-        ax[i, j].get_xaxis().set_visible(False)
-        ax[i, j].get_yaxis().set_visible(False)
-
-    for k in range(classes * classes):
-        i = k // classes
-        j = k % classes
-        ax[i, j].cla()
-        ax[i, j].imshow(test_images[k, 0].cpu().data.numpy(), cmap='gray')
-
-    label = 'Epoch {0}'.format(num_epoch)
-    fig.text(0.5, 0.04, label, ha='center')
-    plt.savefig(path)
-
-    if show:
-        plt.show()
-    else:
-        plt.close()
-
-
 def show_train_hist(hist, show=False, save=False, path='Train_hist.png'):
     x = range(len(hist['D_losses']))
 
@@ -144,12 +116,40 @@ if __name__ == '__main__':
     G.cuda()
     D.cuda()
 
+
+    def show_result(num_epoch, classes, show=False, save=False, path='result.png'):
+
+        G.eval()
+        test_images = G(fixed_z_, fixed_y_label_)
+        G.train()
+
+        size_figure_grid = classes
+        fig, ax = plt.subplots(size_figure_grid, size_figure_grid, figsize=(5, 5))
+        for i, j in itertools.product(range(size_figure_grid), range(size_figure_grid)):
+            ax[i, j].get_xaxis().set_visible(False)
+            ax[i, j].get_yaxis().set_visible(False)
+
+        for k in range(classes * classes):
+            i = k // classes
+            j = k % classes
+            ax[i, j].cla()
+            ax[i, j].imshow(test_images[k, 0].cpu().data.numpy(), cmap='gray')
+
+        label = 'Epoch {0}'.format(num_epoch)
+        fig.text(0.5, 0.04, label, ha='center')
+        plt.savefig(path)
+
+        if show:
+            plt.show()
+        else:
+            plt.close()
+
     # Binary Cross Entropy loss
     BCE_loss = nn.BCELoss()
 
     # Adam optimizer
     G_optimizer = optim.Adam(G.parameters(), lr=lr, betas=(0.5, 0.999))
-    D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
+    D_optimizer = optim.Adam(D.parameters(), lr=lr/2, betas=(0.5, 0.999))
 
     if not os.path.isdir(root):
         os.mkdir(root)
@@ -243,14 +243,14 @@ if __name__ == '__main__':
             # train generator G
             G.zero_grad()
 
-            z_ = torch.randn((mini_batch, classes * classes)
-                             ).view(-1, classes * classes, 1, 1)
-            y_ = (torch.rand(mini_batch, 1) *
-                  classes).type(torch.LongTensor).squeeze()
-            y_label_ = onehot[y_]
-            y_fill_ = fill[y_]
-            z_, y_label_, y_fill_ = Variable(z_.cuda()), Variable(
-                y_label_.cuda()), Variable(y_fill_.cuda())
+            # z_ = torch.randn((mini_batch, classes * classes)
+            #                  ).view(-1, classes * classes, 1, 1)
+            # y_ = (torch.rand(mini_batch, 1) *
+            #       classes).type(torch.LongTensor).squeeze()
+            # y_label_ = onehot[y_]
+            # y_fill_ = fill[y_]
+            # z_, y_label_, y_fill_ = Variable(z_.cuda()), Variable(
+            #     y_label_.cuda()), Variable(y_fill_.cuda())
 
             G_result = G(z_, y_label_)
             D_result = D(G_result, y_fill_).squeeze()
@@ -264,7 +264,7 @@ if __name__ == '__main__':
 
             G_losses.append(G_train_loss.data)
             print('epoch [%d/%d] batch [%d/%d] - loss_d: %.3f, loss_g: %.3f' % ((epoch + 1), train_epoch, i, batch_size, torch.mean(torch.FloatTensor(D_losses)),
-                                                                torch.mean(torch.FloatTensor(G_losses))))
+                                                                                torch.mean(torch.FloatTensor(G_losses))))
 
         epoch_end_time = time.time()
         per_epoch_ptime = epoch_end_time - epoch_start_time

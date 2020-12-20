@@ -17,6 +17,8 @@ import torch
 
 import math
 
+from Models import DCGAN_Generator, DCGAN_Discriminator
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Deep Convolutional GAN for Quick Draw doodle generation.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -60,64 +62,6 @@ if __name__ == '__main__':
         elif classname.find("BatchNorm2d") != -1:
             torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
             torch.nn.init.constant_(m.bias.data, 0.0)
-
-    class Generator(nn.Module):
-        def __init__(self, size, lat, channels):
-            super(Generator, self).__init__()
-
-            self.init_size = size // 4
-            self.l1 = nn.Sequential(
-                nn.Linear(lat, 128 * self.init_size ** 2))
-
-            self.conv_blocks = nn.Sequential(
-                nn.BatchNorm2d(128),
-                nn.Upsample(scale_factor=2),
-                nn.Conv2d(128, 128, 3, stride=1, padding=1),
-                nn.BatchNorm2d(128, 0.8),
-                nn.LeakyReLU(0.2, inplace=True),
-                nn.Upsample(scale_factor=2),
-                nn.Conv2d(128, 64, 3, stride=1, padding=1),
-                nn.BatchNorm2d(64, 0.8),
-                nn.LeakyReLU(0.2, inplace=True),
-                nn.Conv2d(64, channels, 3, stride=1, padding=1),
-                nn.Tanh(),
-            )
-
-        def forward(self, z):
-            out = self.l1(z)
-            out = out.view(out.shape[0], 128, self.init_size, self.init_size)
-            img = self.conv_blocks(out)
-            return img
-
-    class Discriminator(nn.Module):
-        def __init__(self):
-            super(Discriminator, self).__init__()
-
-            def discriminator_block(in_filters, out_filters, bn=True):
-                block = [nn.Conv2d(in_filters, out_filters, 3, 2, 1), nn.LeakyReLU(
-                    0.2, inplace=True), nn.Dropout2d(0.25)]
-                if bn:
-                    block.append(nn.BatchNorm2d(out_filters, 0.8))
-                return block
-
-            self.model = nn.Sequential(
-                *discriminator_block(args.channels, 16, bn=False),
-                *discriminator_block(16, 32),
-                *discriminator_block(32, 64),
-                *discriminator_block(64, 128),
-            )
-
-            # The height and width of downsampled image
-            ds_size = args.img_size // 2 ** 4
-            self.adv_layer = nn.Sequential(
-                nn.Linear(128 * ds_size ** 2, 1), nn.Sigmoid())
-
-        def forward(self, img):
-            out = self.model(img)
-            out = out.view(out.shape[0], -1)
-            validity = self.adv_layer(out)
-
-            return validity
 
     class QuickDrawDataset(Dataset):
         """Quick Draw dataset."""
@@ -204,19 +148,17 @@ if __name__ == '__main__':
                     % (epoch, epochs, i, len(dataloader), d_loss.item(), g_loss.item())
                 )
 
-                batches_done = epoch * len(dataloader) + i
-                if batches_done % interval == 0:
-                    if logging:
-                        G_LOSS.append(float(g_loss.cpu().detach().numpy().astype(float)))
-                        D_LOSS.append(float(d_loss.cpu().detach().numpy().astype(float)))
-                        save_image(gen_imgs.data[:16], "images/" + name + "/%d.png" %
-                                batches_done, nrow=4, normalize=True)
-                        with open("./logs/" + name + "/g_loss_" + name + ".txt", "w") as output:
-                            output.write(str(G_LOSS))
-                        with open("./logs/" + name + "/d_loss_" + name + ".txt", "w") as output:
-                            output.write(str(D_LOSS))
-                    if save_model:
-                        torch.save(generator.state_dict(), './models/' + name + '/model_' + name + '_' + str(batches_done) + '.pytorch')
+            if logging:
+                G_LOSS.append(float(g_loss.cpu().detach().numpy().astype(float)))
+                D_LOSS.append(float(d_loss.cpu().detach().numpy().astype(float)))
+                save_image(gen_imgs.data[:16], "images/" + name + "/%d.png" %
+                        batches_done, nrow=4, normalize=True)
+                with open("./logs/" + name + "/g_loss_" + name + ".txt", "w") as output:
+                    output.write(str(G_LOSS))
+                with open("./logs/" + name + "/d_loss_" + name + ".txt", "w") as output:
+                    output.write(str(D_LOSS))
+            if save_model:
+                torch.save(generator.state_dict(), './models/' + name + '/model_' + name + '_' + str(batches_done) + '.pytorch')
 
 
     # load training data
@@ -230,8 +172,8 @@ if __name__ == '__main__':
     adversarial_loss = torch.nn.BCELoss()
 
     # Initialize generator and discriminator
-    generator = Generator(size=args.img_size, lat=args.latent_dim, channels=args.channels)
-    discriminator = Discriminator()
+    generator = DCGAN_Generator(size=args.img_size, lat=args.latent_dim, channels=args.channels)
+    discriminator = DCGAN_Discriminator(size=args.img_size, channels=args.channels)
 
     if cuda:
         generator.cuda()

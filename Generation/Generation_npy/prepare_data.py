@@ -29,4 +29,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Download data.
+    os.makedirs("Data", exist_ok=True)
     download()

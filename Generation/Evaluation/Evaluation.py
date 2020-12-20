@@ -9,12 +9,14 @@ import pandas as pd
 import argparse
 from torch.autograd import Variable
 
-from GANs.Models import DCGAN
+from Models import DCGAN_Generator, DCCGAN_Generator
 
 
-def getModel(name, img_size, latent_dim, channels):
+def getModel(name, img_size, latent_dim, channels, classes):
     if name == "DCGAN":
-        return DCGAN(size=img_size, lat=latent_dim, channels=channels)
+        return DCGAN_Generator(size=img_size, lat=latent_dim, channels=channels)
+    if name == "DCCGAN":
+        return DCCGAN_Generator(labels=classes, d=128)
 
 
 if __name__ == '__main__':
@@ -37,6 +39,8 @@ if __name__ == '__main__':
                         help="size of each image dimension (size * size)")
     parser.add_argument("--channels", '-ch', type=int, default=1,
                         help="number of image channels")
+    parser.add_argument("--classes", '-c', type=int, default=10,
+                        help="number of classes")
     parser.add_argument("--gen_img", '-gen', type=int, default=1,
                         help="enable/disable image generation")
 
@@ -50,7 +54,7 @@ if __name__ == '__main__':
     files = os.listdir("./" + args.models_root)
     for f in files:
 
-        generator = getModel(args.model, args.img_size, args.latent_dim, args.channels)
+        generator = getModel(args.model, args.img_size, args.latent_dim, args.channels, args.classes)
         generator.load_state_dict(torch.load(
             './' + args.models_root + '/' + f))
         if cuda:
@@ -59,33 +63,78 @@ if __name__ == '__main__':
         label = f.split("_")[1]
         print("Model loaded, start evaluating " + label + ".")
 
-        z = Variable(Tensor(np.random.normal(
-            -1, 1, (args.img_size, args.latent_dim))))
+        if args.model == "DCGAN": 
 
-        # Generate a batch of images
-        gen_imgs = generator(z)[:args.output_num]
+            z = Variable(Tensor(np.random.normal(
+                -1, 1, (args.img_size, args.latent_dim))))
 
-        gen_imgs = gen_imgs.reshape(
-            args.output_num, args.img_size, args.img_size)
+            # Generate a batch of images
+            gen_imgs = generator(z)[:args.output_num]
 
-        gen_imgs = gen_imgs.cpu().detach().numpy()
+            gen_imgs = gen_imgs.reshape(
+                args.output_num, args.img_size, args.img_size)
 
-        print(gen_imgs.shape)
+            gen_imgs = gen_imgs.cpu().detach().numpy()
 
-        del generator
-        i = 0
-        for img in gen_imgs:
-            i = i + 1
-            np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
-                       str(i) + ".csv", img, delimiter=",")
+            print(gen_imgs.shape)
 
-        print("Csv generation complete.")
+            del generator
+            i = 0
+            for img in gen_imgs:
+                i = i + 1
+                np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
+                        str(i) + ".csv", img, delimiter=",")
 
-        if args.gen_img :
-            os.makedirs(args.output_dir + '/images', exist_ok=True)
+            print("Csv generation complete.")
 
-            files = os.listdir("./" + args.output_dir + '/csv')
-            for f in files:
-                img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
-                plt.imshow(img, cmap='gray')
-                plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')
+            if args.gen_img :
+                os.makedirs(args.output_dir + '/images', exist_ok=True)
+
+                files = os.listdir("./" + args.output_dir + '/csv')
+                for f in files:
+                    img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
+                    plt.imshow(img)
+                    plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')
+
+        if args.model == "DCCGAN":
+                # fixed noise & label
+            classes = args.classes
+
+            onehot = torch.zeros(classes, classes)
+            onehot = onehot.scatter_(1, torch.LongTensor(
+                np.arange(classes)).view(classes, 1), 1).view(classes, classes, 1, 1)
+
+            z_ = torch.randn((args.output_num * classes, classes * classes)
+                             ).view(-1, classes * classes, 1, 1)
+
+            fixed_y_ = torch.zeros(args.output_num, 1)          
+            for i in range(classes - 1):
+                temp = torch.ones(args.output_num, 1) + i
+                fixed_y_ = torch.cat([fixed_y_, temp], 0)
+
+            y_ = (fixed_y_).type(torch.LongTensor).squeeze()
+            y_label_ = onehot[y_]
+            z_, y_label_ = Variable(z_.cuda()), Variable(
+                y_label_.cuda())
+
+            generator.eval()
+            gen_imgs = generator(z_, y_label_)
+            gen_imgs = Variable(gen_imgs.cpu())
+
+            del generator
+            i = 0
+            for img in gen_imgs:
+                i = i + 1
+                np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
+                        str(i) + ".csv", img[0], delimiter=",")
+
+            print("Csv generation complete.")
+
+            if args.gen_img :
+                os.makedirs(args.output_dir + '/images', exist_ok=True)
+
+                files = os.listdir("./" + args.output_dir + '/csv')
+                for f in files:
+                    img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
+                    plt.imshow(img)
+                    plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')

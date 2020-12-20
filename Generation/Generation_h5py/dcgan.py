@@ -45,8 +45,6 @@ if __name__ == '__main__':
                         help="size of each image dimension (size * size)")
     parser.add_argument("--channels", '-ch', type=int, default=1,
                         help="number of image channels")
-    parser.add_argument("--sample_interval", '-i', type=int,
-                        default=200, help="interval between image sampling.")
     parser.add_argument("--logging", '-log', type=int,
                         default=0, help="enable/disable logging")
     parser.add_argument("--save_model", '-m', type=int,
@@ -64,7 +62,7 @@ if __name__ == '__main__':
             torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
             torch.nn.init.constant_(m.bias.data, 0.0)
 
-    def train(epochs=200, name='object', interval=200, logging=False, save_model=True):
+    def train(epochs=200, name='object', logging=False, save_model=True):
 
         if logging:
             os.makedirs("images", exist_ok=True)
@@ -129,19 +127,19 @@ if __name__ == '__main__':
                     % (epoch, epochs, i, len(dataloader), d_loss.item(), g_loss.item())
                 )
 
-                batches_done = epoch * len(dataloader) + i
-                if batches_done % interval == 0:
-                    if logging:
-                        G_LOSS.append(float(g_loss.cpu().detach().numpy().astype(float)))
-                        D_LOSS.append(float(d_loss.cpu().detach().numpy().astype(float)))
-                        save_image(gen_imgs.data[:16], "images/" + name + "/%d.png" %
-                                batches_done, nrow=4, normalize=True)
-                        with open("./logs/" + name + "/g_loss_" + name + ".txt", "w") as output:
-                            output.write(str(G_LOSS))
-                        with open("./logs/" + name + "/d_loss_" + name + ".txt", "w") as output:
-                            output.write(str(D_LOSS))
-                    if save_model:
-                        torch.save(generator.state_dict(), './models/' + name + '/model_' + name + '_' + str(batches_done) + '.pytorch')
+                # batches_done = epoch * len(dataloader) + i
+
+            if logging:
+                G_LOSS.append(float(g_loss.cpu().detach().numpy().astype(float)))
+                D_LOSS.append(float(d_loss.cpu().detach().numpy().astype(float)))
+                save_image(gen_imgs.data[:16], "images/" + name + "/%d.png" %
+                        epoch + 1, nrow=4, normalize=True)
+                with open("./logs/" + name + "/g_loss_" + name + ".txt", "w") as output:
+                    output.write(str(G_LOSS))
+                with open("./logs/" + name + "/d_loss_" + name + ".txt", "w") as output:
+                    output.write(str(D_LOSS))
+            if save_model:
+                torch.save(generator.state_dict(), './models/' + name + '/model_' + name + '_' + str(epoch + 1) + '.pytorch')
 
 
     # load training data
@@ -179,4 +177,4 @@ if __name__ == '__main__':
     #  Training
     # ----------
 
-    train(epochs=args.epochs, name=args.object, interval=args.sample_interval, logging=args.logging, save_model=args.save_model)
+    train(epochs=args.epochs, name=args.object, logging=args.logging, save_model=args.save_model)
