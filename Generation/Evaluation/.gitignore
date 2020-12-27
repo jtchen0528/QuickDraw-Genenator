@@ -1,4 +1,3 @@
-/output
-/Models
-/Models_DCCGAN
+/output*/images
+/Models*
 /__pycache__

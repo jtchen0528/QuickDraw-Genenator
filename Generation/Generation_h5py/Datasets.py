@@ -27,6 +27,9 @@ class QuickDrawDataset_h5py(Dataset):
             total_label = np.append(total_label, label, axis=0)
             index = index + 1
 
+        print(total_data.shape)
+        print(total_label.shape)
+
         self.data_frame = total_data
         self.label_frame = total_label
 
@@ -63,7 +66,6 @@ class QuickDrawDataset(Dataset):
 
         data2 = np.array(data2)
         data2 = np.reshape(data2, (len(data2), 1, img_w // 2, img_h // 2))
-
         self.data_frame = data2
 
     def __len__(self):

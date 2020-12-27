@@ -277,6 +277,10 @@ if __name__ == '__main__':
         train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
         train_hist['per_epoch_ptimes'].append(per_epoch_ptime)
 
+        if args.logging == 1:
+            torch.save(G.state_dict(), root + 'models/' + epoch + '_' + model + 'generator_param.pkl')
+            torch.save(D.state_dict(), root + 'models/' + epoch + '_' + model + 'discriminator_param.pkl')
+
     end_time = time.time()
     total_ptime = end_time - start_time
     train_hist['total_ptime'].append(total_ptime)
@@ -284,8 +288,7 @@ if __name__ == '__main__':
     print("Avg one epoch ptime: %.2f, total %d epochs ptime: %.2f" % (torch.mean(
         torch.FloatTensor(train_hist['per_epoch_ptimes'])), train_epoch, total_ptime))
     print("Training finish!... save training results")
-    torch.save(G.state_dict(), root + model + 'generator_param.pkl')
-    torch.save(D.state_dict(), root + model + 'discriminator_param.pkl')
+
     with open(root + model + 'train_hist.pkl', 'wb') as f:
         pickle.dump(train_hist, f)
 

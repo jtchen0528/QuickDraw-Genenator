@@ -8,6 +8,7 @@ import torch.utils.data as data
 import pandas as pd
 import argparse
 from torch.autograd import Variable
+from skimage import transform
 
 from Models import DCGAN_Generator, DCCGAN_Generator
 
@@ -81,6 +82,7 @@ if __name__ == '__main__':
             del generator
             i = 0
             for img in gen_imgs:
+                img = transform.resize(img, (64, 64))
                 i = i + 1
                 np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
                         str(i) + ".csv", img, delimiter=",")
