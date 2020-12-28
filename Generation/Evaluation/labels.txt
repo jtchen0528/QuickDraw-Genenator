@@ -1,0 +1,1 @@
+['airplane', 'bee', 'bicycle', 'bird', 'butterfly', 'cake', 'camera', 'cat', 'chair', 'clock', 'computer', 'diamond', 'door', 'ear', 'guitar', 'hamburger', 'hammer', 'hand', 'hat', 'ladder', 'leaf', 'lion', 'pencil', 'rabbit', 'scissors', 'shoe', 'star', 'sword', 'The_Eiffel_Tower', 'tree']

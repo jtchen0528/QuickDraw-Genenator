@@ -100,6 +100,9 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(net.parameters(), state['learning_rate'],
                                 momentum=state['momentum'], weight_decay=state['weight_decay'])
 
+    Train_Loss = []
+    Test_Loss = []
+
     def train():
         net.train()
         loss_avg = 0.0
@@ -137,6 +140,7 @@ if __name__ == '__main__':
 
         state['train_loss'] = loss_avg
         state['train_accuracy'] = correct/len(train_loader.dataset)
+        Train_Loss.append(loss_avg)
 
     def test():
         net.eval()
@@ -169,6 +173,7 @@ if __name__ == '__main__':
 
         state['test_loss'] = loss_avg/len(test_loader)
         state['test_accuracy'] = correct/len(test_loader.dataset)
+        Test_Loss.append(loss_avg/len(test_loader))
 
     # Main loop
     best_accuracy = 0.0
@@ -195,5 +200,11 @@ if __name__ == '__main__':
         print(state)
         print("Best accuracy: %.4f" % best_accuracy)
         print("*"*50)
+
+    with open("./train_loss.txt", "w") as output:
+        output.write(str(Train_Loss))
+
+    with open("./test_loss.txt", "w") as output:
+        output.write(str(Test_Loss))
 
     log.close()
