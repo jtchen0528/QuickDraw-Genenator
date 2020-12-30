@@ -67,6 +67,7 @@ if __name__ == '__main__':
         if args.model == "DCGAN": 
 
             label = f.split("_")[1]
+            if label == "The": label = "The_Effiel_Tower"
             print("Model loaded, start evaluating " + label + ".")
 
             z = Variable(Tensor(np.random.normal(
@@ -151,3 +152,13 @@ if __name__ == '__main__':
             img = np.genfromtxt('./' + args.output_dir + '/csv/' + f, delimiter=',')
             plt.imshow(img)
             plt.savefig('./' + args.output_dir + '/images/' + f[:-4] + '.png')
+
+
+    files = os.listdir("./" + args.output_dir + "/csv")
+    for f in files:
+        with open('./' + args.output_dir + '/csv/' + f, "r") as data:
+            csv = data.read()
+            csv = csv.split('\n')
+            csv.pop(-1)
+        with open('./' + args.output_dir + '/csv/' + f, "w") as data:
+            data.write('[' + str(csv) + ']')
