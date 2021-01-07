@@ -38,3 +38,8 @@
         ```
         python ./Evaluation Evaluation.py -h
         ```
+        example:
+        ```
+        python Evaluation.py -r Models_DCCGAN -m DCCGAN2 -c 30
+        python Evaluation.py -r Models_DCGAN
+        ```
