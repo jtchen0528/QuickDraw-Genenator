@@ -46,8 +46,13 @@ if __name__ == '__main__':
                         help="number of classes")
     parser.add_argument("--gen_img", '-gen', type=int, default=1,
                         help="enable/disable image generation")
+    parser.add_argument("--input_csv", '-i', type=str, default="Generator_input_example.csv",
+                        help="input labels from csv")
 
     args = parser.parse_args()
+
+    with open(args.input_csv) as output: 
+        required_labels = output.read().rstrip().split(',')
 
     cuda = True if torch.cuda.is_available() else False
     Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
@@ -68,30 +73,32 @@ if __name__ == '__main__':
 
             label = f.split("_")[1]
             if label == "The": label = "The_Effiel_Tower"
-            print("Model loaded, start evaluating " + label + ".")
 
-            z = Variable(Tensor(np.random.normal(
-                -1, 1, (args.img_size, args.latent_dim))))
+            for item in required_labels:
+                if label == item:
+                    print("Model loaded, start evaluating " + label + ".")
+                    z = Variable(Tensor(np.random.normal(
+                        -1, 1, (args.img_size, args.latent_dim))))
 
-            # Generate a batch of images
-            gen_imgs = generator(z)[:args.output_num]
+                    # Generate a batch of images
+                    gen_imgs = generator(z)[:args.output_num]
 
-            gen_imgs = gen_imgs.reshape(
-                args.output_num, args.img_size, args.img_size)
+                    gen_imgs = gen_imgs.reshape(
+                        args.output_num, args.img_size, args.img_size)
 
-            gen_imgs = gen_imgs.cpu().detach().numpy()
+                    gen_imgs = gen_imgs.cpu().detach().numpy()
 
-            print(gen_imgs.shape)
+                    print(gen_imgs.shape)
 
-            del generator
-            i = 0
-            for img in gen_imgs:
-                img = transform.resize(img, (64, 64))
-                i = i + 1
-                np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
-                        str(i) + ".csv", img, delimiter=",")
+                    del generator
+                    i = 0
+                    for img in gen_imgs:
+                        img = transform.resize(img, (64, 64))
+                        i = i + 1
+                        np.savetxt("./" + args.output_dir + "/csv/" + label + "_" +
+                                str(i) + ".csv", img, delimiter=",")
 
-            print("Csv generation complete.")
+                    print("Csv generation complete.")
 
         if args.model == "DCCGAN" or args.model == "DCCGAN2":
                 # fixed noise & label
@@ -134,9 +141,11 @@ if __name__ == '__main__':
                 # print(l, i)
                 if (l == 30):
                     break
-                new_img = transform.resize(img[0], (64, 64))
-                np.savetxt("./" + args.output_dir + "/csv/" + labels[l] + "_" +
-                        str(i) + ".csv", new_img, delimiter=",")
+                for item in required_labels:
+                    if item == labels[l]:
+                        new_img = transform.resize(img[0], (64, 64))
+                        np.savetxt("./" + args.output_dir + "/csv/" + labels[l] + "_" +
+                                str(i) + ".csv", new_img, delimiter=",")
                 if (i == 10): 
                     l = l + 1
                     i = 0
