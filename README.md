@@ -58,3 +58,8 @@ Model: DCGAN / DCCGAN
         ```bash
         python Evaluation.py -r Trained_models -m DCCGAN -c 30
         ```
+## Credit
+Thanks these guys.
+*   [XJay18/QuickDraw-pytorch](https://github.com/XJay18/QuickDraw-pytorch)
+*   [eriklindernoren/PyTorch-GAN](https://github.com/eriklindernoren/PyTorch-GAN)
+*   [togheppi/cDCGAN](https://github.com/togheppi/cDCGAN)
