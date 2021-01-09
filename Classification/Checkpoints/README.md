@@ -1,1 +1,0 @@
-:smiley: This folder is used for saving checkpoints.

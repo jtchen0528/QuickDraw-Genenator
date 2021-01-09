@@ -7,6 +7,8 @@ from generate_data import generate_dataset
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download Quick, Draw! data from Google and then dump the raw data into cache.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--data_root', '-root', type=str, default='Data',
+                        help='root for the data directory.')
     parser.add_argument('--valfold', '-v', type=float,
                         default=0.2, help='Specify the val fold ratio.')
     parser.add_argument('--max_samples_category', '-msc', type=int, default=5000,
@@ -18,5 +20,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Generate dataset
-    generate_dataset(vfold_ratio=args.valfold, max_samples_per_class=args.max_samples_category,
+    generate_dataset(rawdata_root=args.data_root, vfold_ratio=args.valfold, max_samples_per_class=args.max_samples_category,
                      show_imgs=args.show_random_imgs, frame_size=args.img_size)
