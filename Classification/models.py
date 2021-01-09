@@ -2,7 +2,6 @@ import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 def resnet18(numclasses, pretrained=False):
     model = models.resnet18(pretrained)
     conv1_out_channels = model.conv1.out_channels

@@ -1,45 +1,55 @@
 # Doodle Classifier & Generator for QuickDraw!
-
-## Classifier
-* Train
-    1.  Dataset preparation
-        ```
-        python ./DataUtils/prepare_data.py -h
-        ```
-    2. Training
-        ```
-        python main.py -h
-        ```
+|airplane|bicycle|butterfly|cake|camera|chair|clock|diamond|The_Effiel_Tower|
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+|![airplane](imgs/gif/airplane.gif)|![bicycle](imgs/gif/bicycle.gif)|![butterfly](imgs/gif/butterfly.gif)|![cake](imgs/gif/cake.gif)|![camera](imgs/gif/camera.gif)|![chair](imgs/gif/chair.gif)|![clock](imgs/gif/clock.gif)|![diamond](imgs/gif/diamond.gif)|![TheEffielTower](imgs/gif/TheEffielTower.gif)|
+## Doodle Classifier
+Model: ResNet34  
+|| Train  | Test |
+| :---: | :---: | :---: |
+| Loss | ![Train Loss](imgs/classifier_train_loss.png) |  ![Test Loss](imgs/classifier_test_loss.png) |
+| Accuracy |  ![Train Accu](imgs/classifier_train_accu.png) 99% | ![Test Accu](imgs/classifier_test_accu.png) 96% |
+*   Prepare training data
+    ```bash
+    cd Classification
+    python download_data.py -c categories.txt -r Data
+    python ./DataUtils/prepare_data.py -root Data -msc 10000 -v 0.2
+    ```
+*   Start Training
+    ```bash
+    python Classifier.py -e 40 -bs 64 -lr 0.1 -m resnet34
+    ```
 * Evaluation
-    1. Prepare evaluation dataset:
-        ```
-        python ./DataUtils/prepare_data.py -v 0
-        ```
-    2. Evaluation
-        ```
-        python evaluate.py -h
-        ```
+    ```
+    python Evaluation.py -i ***.npy
+    ```
 
 ## Generator
-* Train
-    1. prepare training data in categories.py
+Model: DCGAN / DCCGAN
+|| Discriminator Loss  | Generator Loss | Result |
+| :---: | :---: | :---: | :---: |
+| airplane | ![Discriminator Loss](imgs/D_Loss_DCGAN_airplane.png) |  ![Generator Loss](imgs/G_Loss_DCGAN_airplane.png) | ![airplane](imgs/airplane_DCGAN.png) |
+| camera |  ![Discriminator Loss](imgs/D_Loss_DCGAN_camera.png) | ![Generator Loss](imgs/G_Loss_DCGAN_camera.png) | ![camera](imgs/camera_DCGAN.png)  |
+
+*   Prepare training data
+    ```bash
+    cd Generation
+    python download_data.py -c categories.txt -r Data
+    ```
+*   Start Training  
+    1.  DCGAN
+        ```bash
+        python dcgan.py -o airplane -e 40 -log 1 -lr 5e-5
         ```
-        python download_data.py
+    2.  DCCGAN
+        ```bash
+        python dccgan.py -c 30 -s 50000 -e 4 -log 1 -bs 64
         ```
-    2. Training
+* Evaluation
+    1.  DCGAN
+        ```bash
+        python Evaluation.py -r models/airplane -m DCGAN
         ```
-        python dcgan.py -h
-        ```
-        or
-        ```
-        python dccgan.py -h
-        ```
-    3. Evaluation
-        ```
-        python ./Evaluation Evaluation.py -h
-        ```
-        example:
-        ```
-        python Evaluation.py -r Models_DCCGAN -m DCCGAN2 -c 30
-        python Evaluation.py -r Models_DCGAN
+    2.  DCCGAN
+        ```bash
+        python Evaluation.py -r Trained_models -m DCCGAN -c 30
         ```

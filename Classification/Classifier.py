@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # training
     parser.add_argument('--epochs', '-e', type=int, default=30,
                         help='number of epochs to train.')
-    parser.add_argument('--batch_size', '-b', type=int,
+    parser.add_argument('--batch_size', '-bs', type=int,
                         default=256, help='batch size.')
     parser.add_argument('--learning_rate', '-lr', type=float,
                         default=0.1, help='the learningrate.')
