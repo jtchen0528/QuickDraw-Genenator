@@ -3,11 +3,11 @@
 |airplane|bicycle|butterfly|cake|camera|
 | :---: | :---: | :---: | :---: | :---: |
 |![airplane](imgs/gif/airplane.gif)|![bicycle](imgs/gif/bicycle.gif)|![butterfly](imgs/gif/butterfly.gif)|![cake](imgs/gif/cake.gif)|![camera](imgs/gif/camera.gif)|
-
 |chair|clock|diamond|The_Effiel_Tower|tree|
 | :---: | :---: | :---: | :---: | :---: |
 |![chair](imgs/gif/chair.gif)|![clock](imgs/gif/clock.gif)|![diamond](imgs/gif/diamond.gif)|![TheEffielTower](imgs/gif/TheEffielTower.gif)|![tree](imgs/gif/tree.gif)|
 </div>
+
 ## Doodle Classifier
 Model: ResNet34  
 || Train  | Test |
