@@ -1,4 +1,5 @@
 # Doodle Classifier & Generator for QuickDraw!
+CDCGAN Generator and ResNet34 Classifier for QuickDraw! dataset from Google
 |airplane|bicycle|butterfly|cake|camera|
 | :---: | :---: | :---: | :---: | :---: |
 |![airplane](imgs/gif/airplane.gif)|![bicycle](imgs/gif/bicycle.gif)|![butterfly](imgs/gif/butterfly.gif)|![cake](imgs/gif/cake.gif)|![camera](imgs/gif/camera.gif)|
